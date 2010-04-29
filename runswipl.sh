@@ -1,1 +1,1 @@
-swipl -q -o nur -c nur.pl && ./nur test01
+swipl -q -o nur -c main.pl && ./nur test01
