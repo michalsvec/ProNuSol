@@ -3,6 +3,7 @@
  *
  */
 
+%%%%  FILE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Tests if character is EOF or LF.
 isEndOfFile(C) :-
   C == -1, assert(souborJeNaKonci:-true).
@@ -54,28 +55,30 @@ loadGrid(FileStream) :-
     ))
   )).
 
+%%%% FILE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%% STAOVY PROSTOR  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 coo(Index,CCC) :- 
   cols(W),
-  X is ((Index+1) mod 2)+1,
-  Y is ((Index+1) // 2),
+  X is ((Index+1) mod W)+1,
+  Y is ((Index+1) // W),
   [X,Y] = CCC.
-  
+
 
 combi(Level) :-
   Level > 0,
   coo(Level,[X,Y]),
   %nastav pole na souradnicich X,Y
-  (Level ==1,write('====================='),nl;true),
+%  (Level ==1,write('====================='),nl;true),
 %  write('Uroven je '), write(Level), write(' '), write([X,Y]),nl,
   NextLevel is Level -1,
   assert(black(X,Y)),combi(NextLevel),retract(black(X,Y)),
   assert(white(X,Y)),combi(NextLevel),retract(white(X,Y)),!
     ;
-    findall((G,H),black(G,H),Pole),write('cerne '),write(Pole), nl
-    ,findall((R,S),white(R,S),Pole2),write('white '),write(Pole2), nl,nl
-
+    findall((G,H),black(G,H),Pole)%,write('cerne '),write(Pole), nl
+    ,findall((R,S),white(R,S),Pole2)%,write('white '),write(Pole2), nl,nl
   .
-
 
 combinuj(Cols,Rows) :-
   assert(white(-1,-1)),retract(white(-1,-1)),
@@ -88,6 +91,7 @@ combinuj(Cols,Rows) :-
     fail
   )),
   combi(Depth).
+%%%% STAOVY PROSTOR  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 main :-
@@ -99,7 +103,8 @@ main :-
   close(FileStream),
   rows(RowsNum),write('Rows: '),write(RowsNum),nl,
   cols(ColsNum),write('Cols: '),write(ColsNum),nl,
-  combinuj(2,2),
+  combinuj(ColsNum,RowsNum),
+%  combinuj(4,5),
   write('Aplikace KONCI >>OK<<!'),nl
   .
 

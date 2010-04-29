@@ -1,1 +1,1 @@
-pl -q -o nur -c main.pl && ./nur test01
+pl -q -o nur -c main.pl && ./nur $1
