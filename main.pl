@@ -147,19 +147,15 @@ combi(Level) :-
 %pokud je tam cerna nebo bila napevno
 combi(Level) :-
   level2Coors(Level,[X,Y]),
-  (black(X,Y);white(X,Y);field(X,Y,_)),
   NextLevel is Level -1,
-  combi(NextLevel)
-  .
-  
-combi(Level) :-
-  level2Coors(Level,[X,Y]),
-  %nastav pole na souradnicich X,Y
-%  (Level ==1,write('====================='),nl;true),
-%  write('Uroven je '), write(Level), write(' '), write([X,Y]),nl,
-  NextLevel is Level -1,
-  assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
-  assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
+  (black(X,Y);white(X,Y);field(X,Y,_)) ->
+  (
+    combi(NextLevel)
+  );
+  (
+    assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
+    assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
+  )
   .
 
 solve(Cols,Rows) :-
