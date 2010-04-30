@@ -68,10 +68,10 @@ isInRange(X,Y) :-
   rows(R), Y =< R.
 
 isOutOfX(X) :- 
-  cols(C), X > C.
+  cols(C), X > C;X<1.
 
 isOutOfY(Y) :-
-  rows(R), Y > R.
+  rows(R), Y > R;Y<1.
 
 isBlack(X,Y) :-
   tmp_black(X,Y);black(X,Y).
@@ -157,7 +157,7 @@ combi(0) :-
 %  ,findall((R,S),tmp_white(R,S),Pole2),write('white '),write(Pole2),nl
 %  ,
   ( %if reseni je ok
-    checkBlacks
+    (checkBlacks,checkFields)
   , %then 
     write('Spojite POLE !'),nl,
     printDesk
@@ -295,7 +295,6 @@ checkBlackNeighbours((X,Y)) :-
 */
 checkBlacks :- 
 		setof((G,H), isBlack(G,H), BlackOnes),	% najde vsechny cerne
-    write(BlackOnes),nl,
 		nth1(1, BlackOnes, Frst),				% vybere prvni prvek a od nej zacne hledat prilehle cerne
 
 %		write('cernosi: '),write(BlackOnes),nl,
@@ -316,6 +315,83 @@ checkBlacks :-
 
 		BlackCount=NeighCount
 		.
+		
+
+
+/*
+	pokud je pole bile,
+	nahazi do pameti BILE sousedy daneho pole!
+*/
+getWhiteNeighbours(X,Y) :-
+		write([X,Y]),nl,
+		(
+			not(neighbour(X,Y)), 
+			not(isBlack(X,Y)), 
+			not(field(X,Y,_)), 
+			not(isOutOfX(X)),
+			not(isOutOfY(Y))
+		) ->
+			(
+				assert(neighbour(X,Y)),
+
+				Xr is X+1, Xl is X-1,
+				Yu is Y-1, Yd is Y+1,
+				%write('dostavam: '), write([X,Y]),nl,
+				(	% vsechny okolni prohledame
+					getWhiteNeighbours(Xl, Y),fail;
+					getWhiteNeighbours(Xr, Y),fail;
+					getWhiteNeighbours(X, Yu),fail;
+					getWhiteNeighbours(X, Yd)
+				)
+			)
+			,fail
+		.
+
+/*
+	Overeni pro jedno jednotlive pole
+*/
+checkFieldWhiteNeighbours(X,Y, Count) :-
+
+		field(X,Y,_) -> 		% pokud neni cislo, vratime se vec, ale to by nemelo nastat
+		resetNeighbours,		% reset sousedu, aby byli v pameti sousedi jen pro toto cislo
+		
+		Xr is X+1, Xl is X-1,
+		Yu is Y-1, Yd is Y+1,
+
+%		write('cekuju '),write(X),write('-'), write(Y), nl,
+		(	% vsechny okolni prohledame
+			getWhiteNeighbours(Xl, Y),fail;
+			getWhiteNeighbours(Xr, Y),fail;
+			getWhiteNeighbours(X, Yu),fail;
+			getWhiteNeighbours(X, Yd),fail;
+
+			findall((G,H), neighbour(G,H), Neighbours),
+%			write('bila pole: '),
+%			write(Neighbours),nl,
+			
+			length(Neighbours, NeighCnt),
+			NeighReq is Count-1,	% bilych poli okolo - tzn. cislo-1!
+			NeighReq = NeighCnt
+		)
+		.
+
+
+checkFieldlist([]) :- !.
+checkFieldlist([(X,Y,Z)|T]) :-
+	checkFieldWhiteNeighbours(X,Y,Z) -> (checkFieldlist(T));
+	false
+	.
+
+
+/*
+	Kontrola, jestli ma kazde cislo okolo sebe PRAVE takovy pocet bilych mist 
+	jako je dane cislo
+*/
+checkFields :- 
+		findall((G,H,I), field(G,H,I), Fields),	% najde vsechny cerne
+		checkFieldlist(Fields).
+
+		
 %%%%% /KONTROLA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 main :-
