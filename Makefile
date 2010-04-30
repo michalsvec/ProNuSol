@@ -1,6 +1,10 @@
 #
-# Project: jabberclient
-# Author:  XXXX
+#  Program   : nurikabe.hs
+#  Copyright : tvrdaci 2010
+#  Authors   : Jiri Melichar, Pavel Srb, Michal Svec
+#  Project   : FPR
+#  Version   : 0.0
+#  Modified  : 30.04.2010
 #
 # Usage:
 #   - compile project:       make
