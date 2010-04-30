@@ -95,41 +95,43 @@ combi(Level) :-
   NextLevel is Level -1,
   assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
   assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y)),!
-    ;
-    findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
-    ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2), nl,nl
+    ; %else
+    findall((G,H),tmp_black(G,H),Pole),%write('cerne '),write(Pole), nl
+    ,findall((R,S),tmp_white(R,S),Pole2),%write('white '),write(Pole2),nl
   .
 
-combinuj(Cols,Rows) :-
+solve(Cols,Rows) :-
   assert(tmp_black(-1,-1)),retract(tmp_black(-1,-1)),
   assert(tmp_white(-1,-1)),retract(tmp_white(-1,-1)),
+  assert(black(-1,-1)),retract(black(-1,-1)),
+  assert(white(-1,-1)),retract(white(-1,-1)),
   (Depth is Cols*Rows),
-  not((
+/*  not((
   between(1, Rows, Y),
     between(1, Cols, X),
     Coor = [X, Y],
 %    write('souradnice: '),write(Coor),nl,
     fail
   )),
+*/  
   combi(Depth).
 %%%% STAOVY PROSTOR  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 %%%% VYSTUP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-printDesk(X,Y) :-
-%		write([X,Y]),
-		isOutOfY(Y) -> fail,!;
-		isOutOfX(X) -> (nl, Xnext is 1, Ynext is Y+1, nl, printDesk(Xnext,Ynext));
-		number(X,Y,Z) -> write(Z), write(' '), Xnext is X+1, printDesk(Xnext,Y);
-		white(X,Y) -> (write('_ '), Xnext is X+1, printDesk(Xnext,Y));
-		black(X,Y) -> (write('# '), Xnext is X+1, printDesk(Xnext,Y))
-		.
-		%X2 is X+1, printDesk(X2,Y).
+printField(X,Y) :-
+  isOutOfY(Y) -> fail,!;
+  isOutOfX(X) -> (nl, Xnext is 1, Ynext is Y+1, nl, printField(Xnext,Ynext));
+  field(X,Y,Z) -> write(Z), write(' '), Xnext is X+1, printField(Xnext,Y);
+  isWhite(X,Y) -> (write('_ '), Xnext is X+1, printField(Xnext,Y));
+  isBlack(X,Y) -> (write('# '), Xnext is X+1, printField(Xnext,Y));
+  (write('u '), Xnext is X+1, printField(Xnext,Y))
+  .
 
 printDesk :-
-  printDesk(1,1).
+  write('=== reseni je: ==='),nl,
+  printField(1,1).
  %%%% VYSTUP  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
 
@@ -142,8 +144,9 @@ main :-
   close(FileStream),
   rows(RowsNum),write('Rows: '),write(RowsNum),nl,
   cols(ColsNum),write('Cols: '),write(ColsNum),nl,
-  combinuj(ColsNum,RowsNum),
-%  combinuj(4,5),
+  nl,
+  solve(ColsNum,RowsNum),
+  printDesk,
   write('Aplikace KONCI >>OK<<!'),nl
   .
 
