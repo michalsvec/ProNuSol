@@ -60,8 +60,14 @@ loadGrid(FileStream) :-
 
 
 %%%% POMOCNE PREDIKATY  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+isInRange(X,Y) :-
+  X > 0, Y > 0,
+  cols(C), X =< C,
+  rows(R), Y =< R.
+
 isOutOfX(X) :- 
   cols(C), X > C.
+
 isOutOfY(Y) :-
   rows(R), Y > R.
 
@@ -86,10 +92,33 @@ coors2Level([X,Y],C) :-
 
 %%%% KONTROLA SITUACE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+setBlack([X,Y]):-
+  %souradnice souseda nad aktualnim
+  (X1=X),(Y1 is (Y-1)),
+  %souradnice souseda vpravo
+  (X2 is X+1),(Y2=Y),
+  %souradnice souseda pod aktualnim
+  (X3=X),(Y3 is Y+1),
+  %souradnice souseda vlevo
+  (X4 is X-1), (Y4=Y),
+  %neni-li mimo
+  (
+    isInRange(X1,Y1),assert(black(X1,Y1)),fail;
+    isInRange(X2,Y2),assert(black(X2,Y2)),fail;
+    isInRange(X3,Y3),assert(black(X3,Y3)),fail;
+    isInRange(X4,Y4),assert(black(X4,Y4))
+  );true.
+
+setAllBlack([]):-
+  true.
+setAllBlack([(X,Y)|T]):-
+  setBlack([X,Y]),
+  setAllBlack(T).
+
 % ohranice cerne jednicky
 mark(1):-
-  findall((X,Y),field(X,Y,1),FieldSet),write('cerne '),write(FieldSet) 
-  .
+  findall((X,Y),field(X,Y,1),FieldSet),
+  setAllBlack(FieldSet).
 
 %mark(Number):-
 %  .
@@ -99,19 +128,28 @@ mark(1):-
 
 
 %%%% STAOVY PROSTOR  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%zde se provadi kontrola jestli je plocha validni
+combi(0) :-
+  findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
+  ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2),nl
+  .
+
 combi(Level) :-
-  Level > 0,
+  level2Coors(Level,[X,Y]),
+  (black(X,Y);white(X,Y)),
+  NextLevel is Level -1,
+  combi(NextLevel)
+  .
+
+combi(Level) :-
   level2Coors(Level,[X,Y]),
   %nastav pole na souradnicich X,Y
 %  (Level ==1,write('====================='),nl;true),
 %  write('Uroven je '), write(Level), write(' '), write([X,Y]),nl,
   NextLevel is Level -1,
   assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
-  assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y)),!
-    ; %else
-    %pouze vypis
-    findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
-    ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2),nl
+  assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
   .
 
 solve(Cols,Rows) :-
@@ -125,6 +163,8 @@ solve(Cols,Rows) :-
   coors2Level([3,2],I), write('index: '), write(I), nl,
 
   mark(1),
+
+%  findall((G,H),black(G,H),Pole),write('cerne '),write(Pole), nl,
 
   (Depth is Cols*Rows),
 /*  not((
@@ -142,7 +182,7 @@ solve(Cols,Rows) :-
 
 %%%% VYSTUP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 printField(X,Y) :-
-  isOutOfY(Y) -> fail,!;
+  isOutOfY(Y) -> !;
   isOutOfX(X) -> (Xnext is 1, Ynext is Y+1, nl, printField(Xnext,Ynext));
   field(X,Y,Z) -> write(Z), write(' '), Xnext is X+1, printField(Xnext,Y);
   isWhite(X,Y) -> (write('_ '), Xnext is X+1, printField(Xnext,Y));
