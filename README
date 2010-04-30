@@ -21,6 +21,8 @@ kde X a Y jsou celošíselné hodnoty definující výšku a šířku hrací plo
 Hodnot Z1 až Zn popisují počáteční stav jednotlivých polí hrací plochy. 
 Prázdné pole je značeno hodnotou "0" a číselná hodnota v poli je značena číslem.
 
+Pozor: Testovací soubor musí končit prázdným řádkem !
+
 Příklad testovacího souboru test44:
 
 4 4
