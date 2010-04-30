@@ -135,13 +135,23 @@ combi(0) :-
   ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2),nl
   .
 
+/*
 combi(Level) :-
   level2Coors(Level,[X,Y]),
-  (black(X,Y);white(X,Y)),
+  field(X,Y,_),
   NextLevel is Level -1,
   combi(NextLevel)
   .
+*/
 
+%pokud je tam cerna nebo bila napevno
+combi(Level) :-
+  level2Coors(Level,[X,Y]),
+  (black(X,Y);white(X,Y);field(X,Y,_)),
+  NextLevel is Level -1,
+  combi(NextLevel)
+  .
+  
 combi(Level) :-
   level2Coors(Level,[X,Y]),
   %nastav pole na souradnicich X,Y
