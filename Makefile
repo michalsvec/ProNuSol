@@ -35,6 +35,6 @@ clean:
 # Packing
 pack:
 	make clean
-	zip -r fpr-log-xsrbpa00.zip $(SRCFILES) README Makefile rozdeleni ./test/*
+	zip -r fpr-log-xsrbpa00.zip $(SRCFILES) README Makefile rozdeleni runpl.sh ./test/*
 
 # End of file
