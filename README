@@ -1,0 +1,14 @@
+Překlad programu se provádí Makefilem:
+
+$ make
+
+což vytvoří soubor "nurikabe".
+Spuštění programu s testovací definicí hrací plochy se provádí jednoduše pomocí skriptu:
+
+$ runpl.sh test/test44
+
+Číselný suffix testovacích souborů značí velikost hrací plochy, kterou definují.
+
+Autoři: Melichar Jiří (xmelic04)
+        Srb Pavel a.k.a "The Love Machine" (xsrbpa00)
+        Švec Michal (xsvecm07)
