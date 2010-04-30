@@ -323,7 +323,7 @@ checkBlacks :-
 	nahazi do pameti BILE sousedy daneho pole!
 */
 getWhiteNeighbours(X,Y) :-
-		write([X,Y]),nl,
+%		write([X,Y]),nl,
 		(
 			not(neighbour(X,Y)), 
 			not(isBlack(X,Y)), 
@@ -336,7 +336,7 @@ getWhiteNeighbours(X,Y) :-
 
 				Xr is X+1, Xl is X-1,
 				Yu is Y-1, Yd is Y+1,
-				%write('dostavam: '), write([X,Y]),nl,
+%				write('dostavam: '), write([X,Y]),nl,
 				(	% vsechny okolni prohledame
 					getWhiteNeighbours(Xl, Y),fail;
 					getWhiteNeighbours(Xr, Y),fail;
