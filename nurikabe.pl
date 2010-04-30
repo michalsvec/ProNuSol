@@ -1,6 +1,10 @@
 /**
- * FPR 2010 Nurikabe Pavel
- *
+ *  Program   : nurikabe.hs
+ *  Copyright : tvrdaci 2010
+ *  Authors   : Jiri Melichar, Pavel Srb, Michal Svec
+ *  Project   : FPR
+ *  Version   : 0.0
+ *  Modified  : 30.04.2010
  */
 
 :- dynamic black/2, white/2, tmp_black/2, tmp_white/2, field/3, neighbour/2.
@@ -145,6 +149,33 @@ pools :-
 		between(1,X_Max,X),
 			(isSquare(X,Y),!;fail).	
 
+sumNumbers([],Sum) :-
+  Sum=0.
+sumNumbers([(_,_,Z)|T],Sum):-
+  sumNumbers(T,S),
+  Sum is ( S + Z ).
+
+tooManyBlacks :-
+	%sezenu si seznam cernych poli
+	setof((G,H), black(G,H), BlackOnes),
+			%write('1'),
+	%sezenu si seznam cisel na hraci plose
+	setof((K,J,Z), field(K,J,Z), NumberList),
+	%necham si udelat soucet cisel na hraci plose
+	sumNumbers(NumberList,CC),
+			%write('Sum:'),write(CC),nl,
+	%ziskam pocet cernych poli
+	length(BlackOnes,LengthOfBlack),
+	%velikost hraci plochy
+	cols(Width), rows(Height),
+	(Size is Width*Height),
+			%write('Velikost:'),write(Size),nl,
+	%vim ze tam muze byt celkem Size - SoucetCisel cernych poli
+	SpaceForBlack is Size - CC,
+			%write('Space for black:'),write(SpaceForBlack),nl,
+			%write('Cernych tam je:'),write(LengthOfBlack),nl,
+	SpaceForBlack < LengthOfBlack.
+
 %%%% KONTROLA SITUACE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -159,13 +190,13 @@ combi(0) :-
   ( %if reseni je ok
     (checkBlacks,checkFields)
   , %then 
-    write('Spojite POLE !'),nl,
+%    write('Spojite POLE !'),nl,
     printDesk
   ; %else
-    write('NENI Spojite pole'),nl
+%    write('NENI Spojite pole'),nl
 %    printDesk
 %    true %vrati se nahoru  
-%  true
+  true
   )
   .
 
@@ -189,6 +220,7 @@ combi(Level) :-
 
 combi(Level) :-
   pools,!;
+  tooManyBlacks,!;
   level2Coors(Level,[X,Y]),
 %  write('Level atd: '),write((Level,[X,Y])),nl,
   (black(X,Y);white(X,Y);field(X,Y,_)),
@@ -199,6 +231,7 @@ combi(Level) :-
 %pokud je tam cerna nebo bila napevno
 combi(Level) :-
   pools,!;
+  tooManyBlacks,!;
   level2Coors(Level,[X,Y]),
 %  write('Level atd: '),write((Level,[X,Y])),nl,
   NextLevel is Level -1,

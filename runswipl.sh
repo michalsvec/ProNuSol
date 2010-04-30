@@ -1,1 +1,1 @@
-swipl -q -o nur -c main.pl && ./nur $1
+swipl -q -o nurikabe -c nurikabe.pl && ./nurikabe $1

@@ -10,34 +10,27 @@
 
 # Compiler
 PL = pl
-#HCFLAGS = -Wall -O2 -threaded --make -fglasgow-exts
-HCFLAGS = -Wall -O2 -threaded -package qt --make -i./lib/XMPP-0.0.1 -odir $(BUILDDIR) -hidir $(BUILDDIR)
+PCFLAGS = -q
 
 # Output paths
 OUTDIR = .
-BUILDDIR = $(OUTDIR)/build
-OUTPROJFILE = $(OUTDIR)/jabclient
-#OUTPROJFILE = $(OUTDIR)/test
+OUTPROJFILE = $(OUTDIR)/nurikabe
 
 # Source paths
-SRCDIR = ./src
-#SRCFILES = ./test.hs
-SRCFILES = $(SRCDIR)/gui/Main.hs \
-	$(SRCDIR)/gui/Global.hs \
-	$(SRCDIR)/xmpp/*.hs
+SRCDIR = .
+SRCFILES = $(SRCDIR)/nurikabe.pl
 
 # Project compilation
 all: $(SRCFILES)
-	$(HC) $(HCFLAGS) -o $(OUTPROJFILE) -c $(SRCFILES)
+	$(PL) $(PCFLAGS) -o $(OUTPROJFILE) -c $(SRCFILES)
 
 # Cleaning
 clean:
-	rm -rf $(BUILDDIR)/*.o $(BUILDDIR)/*.hi
 	rm -f $(OUTPROJFILE)
 
 # Packing
 pack:
 	make clean
-	zip -r xxx.zip $(SRCDIR) Makefile README
+	zip -r fpr-log-xsrbpa00.zip $(SRCFILES) Makefile rozdeleni ./test/*
 
 # End of file
