@@ -85,8 +85,8 @@ isWhite(X,Y) :-
 
 level2Coors(Index,C) :- 
   cols(W),
-  X is ((Index-1) // W)+1,
-  Y is ((Index-1) mod W)+1,
+  Y is ((Index-1) // W)+1,
+  X is ((Index-1) mod W)+1,
   [X,Y] = C.
 
 coors2Level([X,Y],C) :- 
@@ -184,7 +184,8 @@ tooManyBlacks :-
 
 %zde se provadi kontrola jestli je plocha validni
 combi(0) :-
-%  findall((G,H),tmp_black(G,H),Pole),write('black '),write(Pole), nl
+%  printDesk,
+%  findall((G,H),isBlack(G,H),Pole),write('black '),write(Pole), nl,
 %  ,findall((R,S),tmp_white(R,S),Pole2),write('white '),write(Pole2),nl
 %  ,
   ( %if reseni je ok
