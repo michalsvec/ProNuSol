@@ -191,13 +191,9 @@ combi(0) :-
   ( %if reseni je ok
     (checkBlacks,checkFields)
   , %then 
-%    write('Spojite POLE !'),nl,
     printDesk
   ; %else
-%    write('NENI Spojite pole'),nl
-%    printDesk
-%    true %vrati se nahoru  
-  true
+    true
   )
   .
 
@@ -431,16 +427,14 @@ checkFields :-
 main :-
   unix(args(Args)),
   nth1(5,Args,FileName),
-  write('kontrolni vypis jmena souboru: "'),write(FileName),write('"'),nl,
+%  write('kontrolni vypis jmena souboru: "'),write(FileName),write('"'),nl,
   open(FileName, read, FileStream),
   loadGrid(FileStream),
   close(FileStream),
-  rows(RowsNum),write('Rows: '),write(RowsNum),nl,
-  cols(ColsNum),write('Cols: '),write(ColsNum),nl,
-  nl,
+%  rows(RowsNum),write('Rows: '),write(RowsNum),nl,
+%  cols(ColsNum),write('Cols: '),write(ColsNum),nl,
   solve,
-%  printDesk,
-  write('Aplikace KONCI >>OK<<!'),nl
+  nl,write('Konec vsech reseni.'),nl
   .
 
 % /*
