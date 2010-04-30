@@ -79,16 +79,19 @@ isWhite(X,Y) :-
 
 
 %%%% STAOVY PROSTOR  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-coo(Index,CCC) :- 
+level2Coors(Index,C) :- 
   cols(W),
   X is ((Index+1) mod W)+1,
   Y is ((Index+1) // W),
-  [X,Y] = CCC.
+  [X,Y] = C.
 
+coors2Level([X,Y],C) :- 
+  cols(W),
+  C is (Y-1)*W+X.
 
 combi(Level) :-
   Level > 0,
-  coo(Level,[X,Y]),
+  level2Coors(Level,[X,Y]),
   %nastav pole na souradnicich X,Y
 %  (Level ==1,write('====================='),nl;true),
 %  write('Uroven je '), write(Level), write(' '), write([X,Y]),nl,
@@ -96,15 +99,21 @@ combi(Level) :-
   assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
   assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y)),!
     ; %else
+    %pouze vypis
     findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
     ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2),nl
   .
 
 solve(Cols,Rows) :-
+  % inicializace
   assert(tmp_black(-1,-1)),retract(tmp_black(-1,-1)),
   assert(tmp_white(-1,-1)),retract(tmp_white(-1,-1)),
   assert(black(-1,-1)),retract(black(-1,-1)),
   assert(white(-1,-1)),retract(white(-1,-1)),
+
+  %test
+  coors2Level([3,2],I), write('index: '), write(I), nl,
+
   (Depth is Cols*Rows),
 /*  not((
   between(1, Rows, Y),
