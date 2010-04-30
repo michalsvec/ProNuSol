@@ -202,6 +202,88 @@ printDesk :-
  %%%% VYSTUP  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
 
+
+%%%%% KONTROLA JESTLI JSOU CERNE POLICKA SPOJITE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/*
+	Smazne vsechny predikaty ulozene v pameti
+*/
+resetMemory :- 
+		rows(R),cols(C),
+		not((
+		between(1, R, Y),
+			between(1, C, X),
+				(retract(black(X,Y))),
+				(retract(white(X,Y))),
+				(retract(field(X,Y,_))),fail
+	    )).
+
+/*
+	Vymazani vsech docasne ulozenych promennych sousedu 
+*/
+deleteNeighbour([]) :- true.
+deleteNeighbour([(X,Y)|T]) :-
+	retract(neighbour(X,Y)),
+	deleteNeighbour(T)
+	.
+
+resetNeighbours :- 
+		findall((G,H), neighbour(G,H), Pole),
+		deleteNeighbour(Pole),
+%		write('delete ok'),nl,
+		true.
+
+/*
+	rekurzivni pruchod a kontrola, zda maji vsechny cerne pole nejakeho souseda
+*/
+checkBlackNeighbours([]) :- fail.
+checkBlackNeighbours((X,Y)) :-
+%		write('checkuje '),write([X,Y]),nl,
+
+		% je cernej, takze priradim do seznamu sousedu a proverim ostatni
+		black(X,Y) -> (
+%			write('cernoch: '),write([X,Y]),nl,
+			Yu is Y-1, Yd is Y+1,
+			Xl is X-1, Xr is X+1,
+			(not(neighbour(X, Y)) -> assert(neighbour(X,Y))),
+			(
+				(not(neighbour(Xl, Y)) -> checkBlackNeighbours((Xl, Y))),fail;
+				(not(neighbour(Xr, Y)) -> checkBlackNeighbours((Xr, Y))),fail;
+				(not(neighbour(X, Yu)) -> checkBlackNeighbours((X, Yu))),fail;
+				(not(neighbour(X, Yd)) -> checkBlackNeighbours((X, Yd)))
+			),
+			true
+		),
+		fail
+		.
+
+/*
+	Kontrola, zda jsou cerne posloupne
+*/
+checkBlacks :- 
+		findall((G,H), black(G,H), BlackOnes),	% najde vsechny cerne
+		nth1(1, BlackOnes, Frst),				% vybere prvni prvek a od nej zacne hledat prilehle cerne
+
+%		write('cernosi: '),write(BlackOnes),nl,
+
+		% smaze z pameti vsechny docasne sousedy
+		resetNeighbours,
+		% zkontroluje jestli ma prvek souseda a rekurzivne hleda sousedy souseda
+		not(checkBlackNeighbours(Frst)),
+
+		%porovnani velikosti poli sousedu prvniho prvku a vsech cernych
+		% kdyz nejsou stejne velka, tak to znamena, ze je nekde odlehla cerna
+		findall((G,H), neighbour(G,H), Neighbours),	% najde vsechny sousedy
+		length(BlackOnes, BlackCount),
+		length(Neighbours, NeighCount),
+
+%		write('Sousedi: '),write(Neighbours),nl,
+%		write('cernochu: '),write(BlackCount),nl,write('sousedu: '),write(NeighCount),nl,
+
+		BlackCount=NeighCount
+		.
+%%%%% /KONTROLA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 main :-
   unix(args(Args)),
   nth1(5,Args,FileName),
