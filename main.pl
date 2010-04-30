@@ -81,8 +81,8 @@ isWhite(X,Y) :-
 
 level2Coors(Index,C) :- 
   cols(W),
-  X is ((Index+1) mod W)+1,
-  Y is ((Index+1) // W),
+  X is ((Index-1) // W)+1,
+  Y is ((Index-1) mod W)+1,
   [X,Y] = C.
 
 coors2Level([X,Y],C) :- 
@@ -157,18 +157,19 @@ combi(0) :-
 %  ,findall((R,S),tmp_white(R,S),Pole2),write('white '),write(Pole2),nl
 %  ,
   ( %if reseni je ok
-    checkBlacks 
+    checkBlacks
   , %then 
     write('Spojite POLE !'),nl,
     printDesk
   ; %else
     write('NENI Spojite pole'),nl,
     true %vrati se nahoru  
-%  printDesk 
 %  true
   )
+  ,printDesk 
   .
 
+/*
 combi(Level) :-
   pools,!;
   level2Coors(Level,[X,Y]),
@@ -179,15 +180,18 @@ combi(Level) :-
     combi(NextLevel)
   ; %else
     NextLevel is Level -1,
-    assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
+    assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),fail;
     assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
   )
   .
+*/
 
-/*
+
 combi(Level) :-
+  pools,!;
   level2Coors(Level,[X,Y]),
-  field(X,Y,_),
+%  write('Level atd: '),write((Level,[X,Y])),nl,
+  (black(X,Y);white(X,Y);field(X,Y,_)),
   NextLevel is Level -1,
   combi(NextLevel)
   .
@@ -196,11 +200,12 @@ combi(Level) :-
 combi(Level) :-
   pools,!;
   level2Coors(Level,[X,Y]),
+%  write('Level atd: '),write((Level,[X,Y])),nl,
   NextLevel is Level -1,
   assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
   assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
   .
-*/
+
 
 solve :-
   % inicializace
@@ -208,6 +213,7 @@ solve :-
   mark(1),
   cols(Width), rows(Height),
   Depth is Width*Height,
+%  printDesk, 
   combi(Depth).
 %%%% STAOVY PROSTOR  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -268,7 +274,7 @@ checkBlackNeighbours((X,Y)) :-
 %		write('checkuje '),write([X,Y]),nl,
 
 		% je cernej, takze priradim do seznamu sousedu a proverim ostatni
-		black(X,Y) -> (
+		isBlack(X,Y) -> (
 %			write('cernoch: '),write([X,Y]),nl,
 			Yu is Y-1, Yd is Y+1,
 			Xl is X-1, Xr is X+1,
