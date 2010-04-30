@@ -96,8 +96,8 @@ combi(Level) :-
   assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
   assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y)),!
     ; %else
-    findall((G,H),tmp_black(G,H),Pole),%write('cerne '),write(Pole), nl
-    ,findall((R,S),tmp_white(R,S),Pole2),%write('white '),write(Pole2),nl
+    findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
+    ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2),nl
   .
 
 solve(Cols,Rows) :-
@@ -122,7 +122,7 @@ solve(Cols,Rows) :-
 %%%% VYSTUP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 printField(X,Y) :-
   isOutOfY(Y) -> fail,!;
-  isOutOfX(X) -> (nl, Xnext is 1, Ynext is Y+1, nl, printField(Xnext,Ynext));
+  isOutOfX(X) -> (Xnext is 1, Ynext is Y+1, nl, printField(Xnext,Ynext));
   field(X,Y,Z) -> write(Z), write(' '), Xnext is X+1, printField(Xnext,Y);
   isWhite(X,Y) -> (write('_ '), Xnext is X+1, printField(Xnext,Y));
   isBlack(X,Y) -> (write('# '), Xnext is X+1, printField(Xnext,Y));
