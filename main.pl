@@ -3,6 +3,8 @@
  *
  */
 
+:- dynamic black/2, white/2, tmp_black/2, tmp_white/2, field/3, neighbour/2.
+
 %%%%  FILE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Tests if character is EOF or LF.
 isEndOfFile(C) :-
@@ -123,6 +125,26 @@ mark(1):-
 %mark(Number):-
 %  .
 
+%Funkce pro kontrolu zda se na souradnici X,Y nachazi 4 cerne bunky
+%pokud zabraly vsechny podminky, tak mam loop
+isSquare(X,Y) :- 
+  Xp is X + 1,
+  Yp is Y + 1,
+  isBlack( X  , Y  ),
+  isBlack( Xp , Y  ),
+  isBlack( X  , Yp ),
+  isBlack( Xp , Yp )
+  .
+
+%vraci true pokud tam jsou loopy
+pools :-
+  cols(Width), rows(Height),
+	X_Max is Width-1,	
+	Y_Max is Height-1,
+	between(1,Y_Max,Y),
+		between(1,X_Max,X),
+			(isSquare(X,Y),!;fail).	
+
 %%%% KONTROLA SITUACE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -131,8 +153,35 @@ mark(1):-
 
 %zde se provadi kontrola jestli je plocha validni
 combi(0) :-
-  findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
-  ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2),nl
+%  findall((G,H),tmp_black(G,H),Pole),write('black '),write(Pole), nl
+%  ,findall((R,S),tmp_white(R,S),Pole2),write('white '),write(Pole2),nl
+%  ,
+  ( %if reseni je ok
+    checkBlacks 
+  , %then 
+    write('Spojite POLE !'),nl,
+    printDesk
+  ; %else
+    write('NENI Spojite pole'),nl,
+    true %vrati se nahoru  
+%  printDesk 
+%  true
+  )
+  .
+
+combi(Level) :-
+  pools,!;
+  level2Coors(Level,[X,Y]),
+  ( %if
+    (black(X,Y);white(X,Y);field(X,Y,_))
+  , %then
+    NextLevel is Level -1,
+    combi(NextLevel)
+  ; %else
+    NextLevel is Level -1,
+    assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
+    assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
+  )
   .
 
 /*
@@ -142,45 +191,23 @@ combi(Level) :-
   NextLevel is Level -1,
   combi(NextLevel)
   .
-*/
 
 %pokud je tam cerna nebo bila napevno
 combi(Level) :-
+  pools,!;
   level2Coors(Level,[X,Y]),
   NextLevel is Level -1,
-  (black(X,Y);white(X,Y);field(X,Y,_)) ->
-  (
-    combi(NextLevel)
-  );
-  (
-    assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
-    assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
-  )
+  assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
+  assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y))
   .
+*/
 
-solve(Cols,Rows) :-
+solve :-
   % inicializace
-  assert(tmp_black(-1,-1)),retract(tmp_black(-1,-1)),
-  assert(tmp_white(-1,-1)),retract(tmp_white(-1,-1)),
-  assert(black(-1,-1)),retract(black(-1,-1)),
-  assert(white(-1,-1)),retract(white(-1,-1)),
-
-  %test
-  coors2Level([3,2],I), write('index: '), write(I), nl,
-
+  %oznaci kolem jednicek 
   mark(1),
-
-%  findall((G,H),black(G,H),Pole),write('cerne '),write(Pole), nl,
-
-  (Depth is Cols*Rows),
-/*  not((
-  between(1, Rows, Y),
-    between(1, Cols, X),
-    Coor = [X, Y],
-%    write('souradnice: '),write(Coor),nl,
-    fail
-  )),
-*/  
+  cols(Width), rows(Height),
+  Depth is Width*Height,
   combi(Depth).
 %%%% STAOVY PROSTOR  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -294,8 +321,8 @@ main :-
   rows(RowsNum),write('Rows: '),write(RowsNum),nl,
   cols(ColsNum),write('Cols: '),write(ColsNum),nl,
   nl,
-  solve(ColsNum,RowsNum),
-  printDesk,
+  solve,
+%  printDesk,
   write('Aplikace KONCI >>OK<<!'),nl
   .
 
