@@ -8,7 +8,35 @@ Spuštění programu s testovací definicí hrací plochy se provádí jednoduš
 $ runpl.sh test/test44
 
 Číselný suffix testovacích souborů značí velikost hrací plochy, kterou definují.
+ 
+Formát testovacího souboru je následující:
+
+X Y
+
+Z1 Z2 Z3 . .
+Z4 Z5 Z6 . .
+.   .  . . .
+.   .  . . .
+
+kde X a Y jsou celošíselné hodnoty definující šířku a výšku hrací plochy.
+Hodnot Z1 až Zn popisují počáteční stav jednotlivých polí hrací plochy. 
+Prázdné pole je značeno hodnotou "0" a číselná hodnota v poli je značena číslem.
+
+Příklad testovacího souboru test44:
+
+4 4
+0 0 0 0 
+0 4 0 1 
+0 0 0 0 
+1 0 0 2 
+
+
+Vylepšení:
+
+a) Naše implementace naléza vícero řešení existují-li pro danou počáteční konfiguraci
+hrací plochy.
+
 
 Autoři: Melichar Jiří (xmelic04)
-        Srb Pavel a.k.a "The Love Machine" (xsrbpa00)
+        Srb Pavel (xsrbpa00)
         Švec Michal (xsvecm07)
