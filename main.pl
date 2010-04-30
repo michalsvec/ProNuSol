@@ -88,6 +88,7 @@ coors2Level([X,Y],C) :-
 
 % ohranice cerne jednicky
 mark(1):-
+  findall((X,Y),field(X,Y,1),FieldSet),write('cerne '),write(FieldSet) 
   .
 
 %mark(Number):-
@@ -123,6 +124,8 @@ solve(Cols,Rows) :-
   %test
   coors2Level([3,2],I), write('index: '), write(I), nl,
 
+  mark(1),
+
   (Depth is Cols*Rows),
 /*  not((
   between(1, Rows, Y),
@@ -148,7 +151,7 @@ printField(X,Y) :-
   .
 
 printDesk :-
-  write('=== reseni je: ==='),nl,
+  nl,write('=== reseni je: ==='),nl,
   printField(1,1).
  %%%% VYSTUP  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
