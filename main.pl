@@ -64,21 +64,13 @@ isOutOfX(X) :-
   cols(C), X > C.
 isOutOfY(Y) :-
   rows(R), Y > R.
-%%%% POMOCNE PREDIKATY  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-%%%% KONTROLA SITUACE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isBlack(X,Y) :-
   tmp_black(X,Y);black(X,Y).
 
 isWhite(X,Y) :-
   tmp_white(X,Y);white(X,Y). 
-%%%% KONTROLA SITUACE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-%%%% STAOVY PROSTOR  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 level2Coors(Index,C) :- 
   cols(W),
   X is ((Index+1) mod W)+1,
@@ -88,7 +80,24 @@ level2Coors(Index,C) :-
 coors2Level([X,Y],C) :- 
   cols(W),
   C is (Y-1)*W+X.
+%%%% POMOCNE PREDIKATY  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%%% KONTROLA SITUACE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% ohranice cerne jednicky
+mark(1):-
+  .
+
+%mark(Number):-
+%  .
+
+%%%% KONTROLA SITUACE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%% STAOVY PROSTOR  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 combi(Level) :-
   Level > 0,
   level2Coors(Level,[X,Y]),
