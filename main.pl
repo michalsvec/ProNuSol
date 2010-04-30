@@ -162,11 +162,11 @@ combi(0) :-
     write('Spojite POLE !'),nl,
     printDesk
   ; %else
-    write('NENI Spojite pole'),nl,
-    true %vrati se nahoru  
+    write('NENI Spojite pole'),nl
+%    printDesk
+%    true %vrati se nahoru  
 %  true
   )
-  ,printDesk 
   .
 
 /*
@@ -224,8 +224,8 @@ printField(X,Y) :-
   isOutOfY(Y) -> !;
   isOutOfX(X) -> (Xnext is 1, Ynext is Y+1, nl, printField(Xnext,Ynext));
   field(X,Y,Z) -> write(Z), write(' '), Xnext is X+1, printField(Xnext,Y);
-  isWhite(X,Y) -> (write('_ '), Xnext is X+1, printField(Xnext,Y));
   isBlack(X,Y) -> (write('# '), Xnext is X+1, printField(Xnext,Y));
+  isWhite(X,Y) -> (write('_ '), Xnext is X+1, printField(Xnext,Y));
   (write('u '), Xnext is X+1, printField(Xnext,Y))
   .
 
@@ -294,7 +294,8 @@ checkBlackNeighbours((X,Y)) :-
 	Kontrola, zda jsou cerne posloupne
 */
 checkBlacks :- 
-		findall((G,H), black(G,H), BlackOnes),	% najde vsechny cerne
+		setof((G,H), isBlack(G,H), BlackOnes),	% najde vsechny cerne
+    write(BlackOnes),nl,
 		nth1(1, BlackOnes, Frst),				% vybere prvni prvek a od nej zacne hledat prilehle cerne
 
 %		write('cernosi: '),write(BlackOnes),nl,
