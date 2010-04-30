@@ -58,6 +58,26 @@ loadGrid(FileStream) :-
 %%%% FILE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
+%%%% POMOCNE PREDIKATY  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+isOutOfX(X) :- 
+  cols(C), X > C.
+isOutOfY(Y) :-
+  rows(R), Y > R.
+%%%% POMOCNE PREDIKATY  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%% KONTROLA SITUACE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+isBlack(X,Y) :-
+  tmp_black(X,Y);black(X,Y).
+
+isWhite(X,Y) :-
+  tmp_white(X,Y);white(X,Y). 
+%%%% KONTROLA SITUACE  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 %%%% STAOVY PROSTOR  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 coo(Index,CCC) :- 
   cols(W),
@@ -73,15 +93,16 @@ combi(Level) :-
 %  (Level ==1,write('====================='),nl;true),
 %  write('Uroven je '), write(Level), write(' '), write([X,Y]),nl,
   NextLevel is Level -1,
-  assert(black(X,Y)),combi(NextLevel),retract(black(X,Y)),
-  assert(white(X,Y)),combi(NextLevel),retract(white(X,Y)),!
+  assert(tmp_black(X,Y)),combi(NextLevel),retract(tmp_black(X,Y)),
+  assert(tmp_white(X,Y)),combi(NextLevel),retract(tmp_white(X,Y)),!
     ;
-    findall((G,H),black(G,H),Pole)%,write('cerne '),write(Pole), nl
-    ,findall((R,S),white(R,S),Pole2)%,write('white '),write(Pole2), nl,nl
+    findall((G,H),tmp_black(G,H),Pole)%,write('cerne '),write(Pole), nl
+    ,findall((R,S),tmp_white(R,S),Pole2)%,write('white '),write(Pole2), nl,nl
   .
 
 combinuj(Cols,Rows) :-
-  assert(white(-1,-1)),retract(white(-1,-1)),
+  assert(tmp_black(-1,-1)),retract(tmp_black(-1,-1)),
+  assert(tmp_white(-1,-1)),retract(tmp_white(-1,-1)),
   (Depth is Cols*Rows),
   not((
   between(1, Rows, Y),
@@ -93,6 +114,24 @@ combinuj(Cols,Rows) :-
   combi(Depth).
 %%%% STAOVY PROSTOR  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%%% VYSTUP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+printDesk(X,Y) :-
+%		write([X,Y]),
+		isOutOfY(Y) -> fail,!;
+		isOutOfX(X) -> (nl, Xnext is 1, Ynext is Y+1, nl, printDesk(Xnext,Ynext));
+		number(X,Y,Z) -> write(Z), write(' '), Xnext is X+1, printDesk(Xnext,Y);
+		white(X,Y) -> (write('_ '), Xnext is X+1, printDesk(Xnext,Y));
+		black(X,Y) -> (write('# '), Xnext is X+1, printDesk(Xnext,Y))
+		.
+		%X2 is X+1, printDesk(X2,Y).
+
+printDesk :-
+  printDesk(1,1).
+ %%%% VYSTUP  END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   
 
 main :-
   unix(args(Args)),
